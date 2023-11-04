@@ -3,9 +3,10 @@
 #define VCL_NAMESPACE VCL
 #include "../../vcl/vectorclass.h"
 
-using VecType = VCL::Vec4d;
+using VecType = VCL::Vec8f;
 
-#define LEN_VEC 4
+#define LEN_VEC 8
+#define ElEMENT_TYPE float
 
 using std::cout, std::endl;
 
@@ -106,7 +107,8 @@ double int_midpoint_vec(double a, double b, int n, Function_vec &fVecPtr)
     double sum = 0;
     VecType sum_vec(0);
     VecType x_mid_vec(0);
-    double x_mid_arr[LEN_VEC] = {0}; // initialize all elements to 0
+
+    ElEMENT_TYPE x_mid_arr[LEN_VEC] = {0}; // initialize all elements to 0
     double x_mid = 0;
     for (int i = 0; i < turns; ++i)
     {
