@@ -1,26 +1,22 @@
 #include <iostream>
 #include <cmath>
+#define VCL_NAMESPACE VCL
 #include "../../vcl/vectorclass.h"
 
-#define GEN_MULTI_PARA(i,v) GEN_MULTI_PARA_##i(v)
-#define GEN_MULTI_PARA_1(v) v
-#define GEN_MULTI_PARA_4(v) v,v,v,v
-#define GEN_MULTI_PARA_8(v) v,v,v,v,v,v,v,v
-#define GEN_MULTI_PARA_16(v) v,v,v,v,v,v,v,v,v,v,v,v,v,v,v,v
+using VecType = VCL::Vec4d;
+using VCL::pow;
 
-using VecType  = Vec4d;
-#define LEN_VEC 4 //when changes, also need to change GEN_MULTI_PARA(LEN_VEC,v)
+#define LEN_VEC 4 // when changes, also need to change GEN_MULTI_PARA(LEN_VEC,v)
 
 using std::cout, std::endl;
 
-template <typename DataType>
 class Function
 {
 public:
-    virtual DataType eval(DataType x) = 0;
+    virtual double eval(double x) = 0;
 };
 
-class F1 : public Function<double>
+class F1 : public Function
 {
 public:
     double eval(double x) override
@@ -29,17 +25,7 @@ public:
     }
 };
 
-class F1_vec : public Function<VecType>
-{
-public:
-    VecType eval(VecType x) override
-    {
-        // VecType exponent(GEN_MULTI_PARA(4,3)); // GEN_MULTI_PARA(4,3) means (3,3,3,3)
-        return pow<int>(x, 3) - 2 * x * x + 3 * x - 1;
-    }
-};
-
-class F2 : public Function<double>
+class F2 : public Function
 {
 public:
     double eval(double x) override
@@ -53,25 +39,7 @@ public:
     }
 };
 
-
-class F2_vec : public Function<VecType>
-{
-public:
-    VecType eval(VecType x) override
-    {
-        VecType exponent;
-        VecType sum(GEN_MULTI_PARA(4,0)); // GEN_MULTI_PARA(4,0) means 4 zeros
-        for (int i = 0; i <= 15; ++i)
-        {
-            // exponent = (GEN_MULTI_PARA(4,i));
-            sum = sum + pow<int>(x, i);
-        }
-        return sum;
-    }
-};
-
-template <typename DataType>
-double int_midpoint(double a, double b, int n, Function<DataType> &fPtr)
+double int_midpoint(double a, double b, int n, Function &fPtr)
 {
     double h = (b - a) / n;
     double sum = 0;
@@ -85,30 +53,69 @@ double int_midpoint(double a, double b, int n, Function<DataType> &fPtr)
     return sum * h;
 }
 
-template <typename DataType>
-double int_midpoint_vec(double a, double b, int n, Function<DataType> &fPtr)
+class Function_vec
+{
+public:
+    virtual VecType eval(VecType x) = 0;
+};
+
+class F1_vec : public Function_vec
+{
+public:
+    VecType eval(VecType x) override
+    {
+        return pow<int>(x, 3) - 2 * x * x + 3 * x - 1;
+    }
+};
+
+class F2_vec : public Function_vec
+{
+public:
+    VecType eval(VecType x) override
+    {
+        VecType exponent;
+        VecType sum(0); // initialize all numbers with 0
+        for (int i = 0; i <= 15; ++i)
+        {
+            sum = sum + pow<int>(x, i);
+        }
+        return sum;
+    }
+};
+
+double int_midpoint_vec(double a, double b, int n, Function_vec &fPtr)
 {
     double h = (b - a) / n;
     int turns = n / LEN_VEC;
     int residual = n % LEN_VEC;
     double sum = 0;
-    VecType sum_vec(GEN_MULTI_PARA(4,0));
-    VecType x_mid(GEN_MULTI_PARA(4,0));
-
+    VecType sum_vec(0);
+    VecType x_mid_vec(0);
+    double x_mid[LEN_VEC] = {0}; // initialize all elements to 0
     for (int i = 0; i < turns; ++i)
     {
-        x_mid = a + (i + 0.5) * h;
-        sum += fPtr.eval(x_mid);
+        for (int j = 0; j < LEN_VEC; ++j)
+        {
+            x_mid[j] = a + (i * LEN_VEC + j + 0.5) * h;
+        }
+
+        x_mid_vec.load(x_mid);
+
+        sum_vec += fPtr.eval(x_mid_vec);
+    }
+
+    for (int i = 0; i < LEN_VEC; ++i)
+    {
+        sum += sum_vec[i];
     }
     return sum * h;
 }
 
 int main(void)
 {
-    F1_vec f1;
+    F1 f1;
+    F1_vec f1_vec;
     F2 f2;
-    auto result1 = int_midpoint(1, 3, 10, f1);
-    for (int i = 0;i<result1.size();++i){
-        cout << result1[i]<< endl;
-    }
+    cout << int_midpoint(1, 10, 100, f1) << endl;
+    cout << int_midpoint_vec(1, 10, 100, f1_vec) << endl;
 }
