@@ -5,8 +5,8 @@
 
 using VecType = VCL::Vec8f;
 
-#define LEN_VEC 8
-#define ElEMENT_TYPE float
+#define LEN_VEC 8 // number of elements in vector, corresponding to VecType
+#define ElEMENT_TYPE float //element type of the vector, corresponding to VecType
 
 using std::cout, std::endl;
 
