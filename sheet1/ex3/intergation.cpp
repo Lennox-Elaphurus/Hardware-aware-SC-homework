@@ -5,7 +5,7 @@
 
 using VecType = VCL::Vec4d;
 
-#define LEN_VEC 4 // when changes, also need to change GEN_MULTI_PARA(LEN_VEC,v)
+#define LEN_VEC 4
 
 using std::cout, std::endl;
 
