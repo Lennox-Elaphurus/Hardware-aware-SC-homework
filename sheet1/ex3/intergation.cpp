@@ -1,9 +1,11 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
 #define VCL_NAMESPACE VCL
-#include "../../vcl/vectorclass.h"
+#include "../../src/vcl/vectorclass.h"
+#include "../../src/time_experiment.hh"
 
-using VecType = VCL::Vec8f;
+using VecType = VCL::Vec8f; //Vec4d
 
 #define LEN_VEC 8 // number of elements in vector, corresponding to VecType
 #define ElEMENT_TYPE float //element type of the vector, corresponding to VecType
@@ -88,7 +90,6 @@ public:
     }
     VecType eval(VecType x) override
     {
-        VecType exponent;
         VecType sum(0); // initialize all numbers with 0
         for (int i = 0; i <= 15; ++i)
         {
@@ -100,7 +101,8 @@ public:
     double eval_single(double x) override { return fPtr->eval(x); }
 };
 
-double int_midpoint_vec(double a, double b, int n, Function_vec &fVecPtr)
+// function overload, differentiate by Function_vec or Function
+double int_midpoint(double a, double b, int n, Function_vec &fVecPtr)
 {
     double h = (b - a) / n;
     int turns = n / LEN_VEC;
@@ -131,19 +133,42 @@ double int_midpoint_vec(double a, double b, int n, Function_vec &fVecPtr)
     return sum * h;
 }
 
+template<typename FunctionType>
+// package an experiment as a functor
+class Experiment {
+public:
+  // construct an experiment
+  Experiment (int num_intervals_, FunctionType F_) : num_intervals(num_intervals_),F(F_){}
+  // run an experiment; can be called several times
+  void run () const { int_midpoint(0, 1000, num_intervals, F); }
+  // report number of operations
+  double operations () const {return 0;} // calculate outside, not here because F can be different
+private:
+    int num_intervals;
+    FunctionType F;
+};
+
+
 int main(void)
 {
     F1 f1;
     F1_vec f1_vec;
     F2 f2;
     F2_vec f2_vec;
-    cout << int_midpoint(1, 10, 50, f1) << endl;
-    cout << int_midpoint_vec(1, 10, 50, f1_vec) << endl;
-    cout << int_midpoint(1, 10, 100, f1) << endl;
-    cout << int_midpoint_vec(1, 10, 100, f1_vec) << endl;
+    // cout << int_midpoint(0, 1000, 50, f1) << endl;
+    // cout << int_midpoint(0, 1000, 50, f1_vec) << endl;
+    // cout << int_midpoint(1, 10, 100, f1) << endl;
+    // cout << int_midpoint(1, 10, 100, f1_vec) << endl;
 
-    cout << int_midpoint(1, 10, 50, f2) << endl;
-    cout << int_midpoint_vec(1, 10, 50, f2_vec) << endl;
-    cout << int_midpoint(1, 10, 100, f2) << endl;
-    cout << int_midpoint_vec(1, 10, 100, f2_vec) << endl;
+    // cout << int_midpoint(1, 10, 50, f2) << endl;
+    // cout << int_midpoint(1, 10, 50, f2_vec) << endl;
+    // cout << int_midpoint(1, 10, 100, f2) << endl;
+    // cout << int_midpoint(1, 10, 100, f2_vec) << endl;
+
+    for (int i = 1; i < 16; ++i){
+        Experiment e_f1(pow(2,i),f1);
+        Experiment e_f1_vec(pow(2,i),f1_vec);
+        Experiment e_f2(pow(2,i),f2);
+        Experiment e_f2_(pow(2,i),f1);
+    }
 }
