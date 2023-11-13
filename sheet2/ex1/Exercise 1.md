@@ -128,14 +128,21 @@ Data movement:
 
 - 1a): $\frac{N}{M}*f_2(M)$
 
-- 1b): The data movement when focusing on single pivot matrix, when 1b) process Y rows, and when calculating `lik`:
-
-    $Y*\frac{(M+1)M}{2}*3*8 = Y(M+1)M*12$
+- 1b): In total, 1b) needs to process $(N-M)*\frac{N}{M}*\frac{1}{2} = \frac{(N-M)N}{2M}$ rows, each with M columns (The  formula for summing an arithmetic series)
 
     In total:
 
-    $(N-M)*\frac{N}{M}*\frac{1}{2}*(M+1)M = \frac{(N-M)N(M+1)}{2}$ (The   formula for summing an arithmetic series)
+    $\frac{(N-M)N}{2M}*(M*3*8+\frac{(1+M)M}{2}*3*8) = 6(M+3)N(N-M)$
 
-- 2): same with 1b), $N^2-NM$ 
+- 2): 2) needs to process $\frac{(N-M)N}{2M}$ columns
 
-- 3): $\frac{\frac{N}{M}-1}{6}[(\frac{N}{M}-1)*M][(\frac{N}{M}-1)*M]= \frac{(\frac{N}{M}-1)^3M^2}{6} = \frac{(N-M)^3}{6M}$ (The formula for summing the squares of an equivariant series)
+    For each column, it needs $f_2(M)$ data movement 
+
+    In total: $\frac{(N-M)N}{2M} *f_2(M) $ 
+
+- 3): The total number of columns that 3) needs to process is $\frac{(N-M)N}{2M}$ 
+
+    For each row the FLOPs is $M*2$
+
+    In total: $\frac{(N-M)N}{2M}* M*2 = (N-M)N$
+
