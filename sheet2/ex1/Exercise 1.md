@@ -97,15 +97,27 @@ $$
 
 - 1a): $\frac{N}{M}*f_1(M)$
 
-- 1b): in total, 1b) needs to process $(N-M)*\frac{N}{M}*\frac{1}{2} = \frac{(N-M)N}{2M}$ rows, each with M columns
+- 1b): In total, 1b) needs to process $(N-M)*\frac{N}{M}*\frac{1}{2} = \frac{(N-M)N}{2M}$ rows, each with M columns (The  formula for summing an arithmetic series)
 
     In total:
 
-    $\frac{(N-M)N}{2M}*(M+\frac{(1+M)M}{2}*2) = \frac{(M+2)(N-M)N}{2}$ (The   formula for summing an arithmetic series)
+    $\frac{(N-M)N}{2M}*(M+\frac{(1+M)M}{2}*2) = \frac{(M+2)(N-M)N}{2}$ 
 
-- 2): $(N-M)*\frac{N}{M}*\frac{1}{2}*M *2=(N-M)N*2$ 
+- 2): 2) needs to process $\frac{(N-M)N}{2M}$ columns
 
-- 3): $\frac{\frac{N}{M}-1}{6}[(\frac{N}{M}-1)*M][(\frac{N}{M}-1)*M]*2= \frac{(\frac{N}{M}-1)^3M^2}{6} *2 = \frac{(N-M)^3}{3M} $ (The formula for summing the squares of an equivariant series)
+    For each column, it needs $f_1(M)$ operations 
+
+    In total: $\frac{(N-M)N}{2M} *f_1(M) $ 
+
+- 3): The total number of columns that 3) needs to process is $\frac{(N-M)N}{2M}$ 
+
+    For each row the number of operations is:
+
+    
+
+    $\frac{\frac{N}{M}-1}{6}[(\frac{N}{M}-1)*M][(\frac{N}{M}-1)*M]*2= \frac{(\frac{N}{M}-1)^3M^2}{6}  = \frac{(N-M)^3}{6M} $ (The formula for summing the squares of an equivariant series)
+
+    
 
     All in total:
     $$
