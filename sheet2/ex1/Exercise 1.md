@@ -109,20 +109,22 @@ $$
 
     In total: $\frac{(N-M)N}{2M} *f_1(M) $ 
 
-- 3): The total number of columns that 3) needs to process is $\frac{(N-M)N}{2M}$ 
+- 3): The total number of elements that 3) needs to process is $\frac{\frac{N}{M}-1}{6}[(\frac{N}{M}-1)*M][(\frac{N}{M}-1)*M]= \frac{(\frac{N}{M}-1)^3M^2}{6} = \frac{(N-M)^3}{6M}$
 
-    For each row the FLOPs is $M*2$
+    For each element in a row the FLOPs is $M*2$
 
-    In total: $\frac{(N-M)N}{2M}* M*2 = (N-M)N$
+    In total: $\frac{(N-M)^3}{3}$
 
 - All in total:
     $$
     \begin{align}
-    & \frac{N}{M}*f_1(M) + \frac{(M+2)(N-M)N}{2} + \frac{(N-M)N}{2M} *f_1(M) + (N-M)N \\ &= \frac{(M+4)N(N-M)}{2} + f_1(M)* \frac{N(-M+N+2)}{2M} \\
-    &= -\frac{M^3}{3} + \frac{M^2N}{3} + \frac{5M^2}{12} + \frac{MN}{4} -\frac{29}{12}M + \frac{23N}{12} - \frac{1}{6}
+    & \frac{N}{M}*f_1(M) + \frac{(M+2)(N-M)N}{2} + \frac{(N-M)N}{2M} *f_1(M)  + \frac{(N-M)^3}{3} \\ 
+    &= -\frac{M^3 N}{3} - \frac{M^3}{3} + \frac{M^2 N^2}{3} + \frac{17 M^2 N}{12} - \frac{3 M N^2}{4} - \frac{17 M N}{12} + \frac{N^3}{3} + \frac{11 N^2}{12} - \frac{N}{6}
     \end{align}
     $$
     
+
+
 
 Data movement:
 
@@ -140,9 +142,20 @@ Data movement:
 
     In total: $\frac{(N-M)N}{2M} *f_2(M) $ 
 
-- 3): The total number of columns that 3) needs to process is $\frac{(N-M)N}{2M}$ 
+- 3): The total number of elements that 3) needs to process is $\frac{(N-M)^3}{6M}$ 
 
-    For each row the FLOPs is $M*2$
+    For each element in a row the data movement is $M*4*8$
 
-    In total: $\frac{(N-M)N}{2M}* M*2 = (N-M)N$
+    In total: $\frac{(N-M)^3}{6M}* M*4*8 = \frac{16(N-M)^3}{3}$
 
+All in total:
+$$
+\begin{aligned}
+& \frac{N}{M}*f_2(M) + 6(M+3)N(N-M) + \frac{(N-M)N}{2M} *f_2(M) + \frac{16(N-M)^3}{3}\\
+&= -4M^3N - \frac{16M^3}{3} + 4M^2N^2 + 24M^2N - 6M^2 - 16MN^2 + 10MN - 18M + \frac{16N^3}{3} - 4N^2 + 10N
+\end{aligned}
+$$
+The intensity is 
+$$
+intensity = \frac{-\frac{M^3 N}{3} - \frac{M^3}{3} + \frac{M^2 N^2}{3} + \frac{17 M^2 N}{12} - \frac{3 M N^2}{4} - \frac{17 M N}{12} + \frac{N^3}{3} + \frac{11 N^2}{12} - \frac{N}{6}}{-4M^3N - \frac{16M^3}{3} + 4M^2N^2 + 24M^2N - 6M^2 - 16MN^2 + 10MN - 18M + \frac{16N^3}{3} - 4N^2 + 10N}
+$$
