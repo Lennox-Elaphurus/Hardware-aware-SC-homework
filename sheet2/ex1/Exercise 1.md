@@ -111,17 +111,16 @@ $$
 
 - 3): The total number of columns that 3) needs to process is $\frac{(N-M)N}{2M}$ 
 
-    For each row the number of operations is:
+    For each row the FLOPs is $M*2$
 
-    
+    In total: $\frac{(N-M)N}{2M}* M*2 = (N-M)N$
 
-    $\frac{\frac{N}{M}-1}{6}[(\frac{N}{M}-1)*M][(\frac{N}{M}-1)*M]*2= \frac{(\frac{N}{M}-1)^3M^2}{6}  = \frac{(N-M)^3}{6M} $ (The formula for summing the squares of an equivariant series)
-
-    
-
-    All in total:
+- All in total:
     $$
-    \frac{N}{M}*f(M) + \frac{(N-M)N(M+1)}{2} + (N-M)N*2 + \frac{(N-M)^3}{3M}
+    \begin{align}
+    & \frac{N}{M}*f_1(M) + \frac{(M+2)(N-M)N}{2} + \frac{(N-M)N}{2M} *f_1(M) + (N-M)N \\ &= \frac{(M+4)N(N-M)}{2} + f_1(M)* \frac{N(-M+N+2)}{2M} \\
+    &= -\frac{M^3}{3} + \frac{M^2N}{3} + \frac{5M^2}{12} + \frac{MN}{4} -\frac{29}{12}M + \frac{23N}{12} - \frac{1}{6}
+    \end{align}
     $$
     
 
