@@ -1,6 +1,6 @@
 # Exercise 1
 
-1. computational intensity of LU decomposition
+## 1. computational intensity of LU decomposition
 
 ```c
 // initialize all entries up to N
@@ -23,20 +23,20 @@ Number of FLOPs:
 
 $$
 \begin{align}
-\Sigma_{k=0}^{n-2} \Sigma_{i=k+1}^{n-1} (1+ \Sigma_{j=k+1}^{n-1} 2) = \frac{1}{3}n^3 + \frac{3}{2}n^2 - \frac{23}{6}n +2
+\Sigma_{k=0}^{n-2} \Sigma_{i=k+1}^{n-1} (1+ \Sigma_{j=k+1}^{n-1} 2) = \frac{2n^3}{3}-\frac{n^2}{2} - \frac{n}{6} =: f_1(n)
 \end{align}
 $$
-Memory access times:
+Data movement:
 $$
-\begin{align}8*\Sigma_{k=0}^{n-2} \Sigma_{i=k+1}^{n-1} (2+ \Sigma_{j=k+1}^{n-1} 2) =  \frac{8}{3}n^3 + 16n^2 - \frac{104}{3}n + 16
+\begin{align}\Sigma_{k=0}^{n-2} \Sigma_{i=k+1}^{n-1} (3*8+ \Sigma_{j=k+1}^{n-1} 3*8) =  8n^3 - 8n  =: f_2(n)
 \end{align}
 $$
 
 $$
-Intensity \approx \lim_{n -> +\infin}\frac{\frac{1}{3}n^3 + \frac{3}{2}n^2 - \frac{23}{6}n +2}{\frac{8}{3}n^3 + 16n^2 - \frac{104}{3}n + 16} = \frac{1}{8}
+Intensity = \frac{\frac{2n^3}{3}-\frac{n^2}{2} - \frac{n}{6}}{ \frac{16}{3}n^3 + 4n^2 - \frac{28}{3}n} \approx \frac{1}{8}
 $$
 
-2. LU decomposition with block
+## 2. LU decomposition with block
 
    ```c++
    // initialize all entries up to N
@@ -84,6 +84,47 @@ $$
    }
    ```
 
-   
+   In this implementation, the algorithm traverse the whole matrix (N by N) by each step focusing on a square matrix with size M by M at the diagonal position. In each step:
 
+   - 1a) Do a regular LU decomposition on a small square M by M matrix(*Let's call it pivot matrix*) at the upper left of the remaining matrix. To save memory space, we store the coefficients that are used to do the elimination at the corresponding position in the lower triangle part of the matrix.
+   - 1b) Eliminate all elements in the same column with pivot matrix and under the pivot matrix. To save memory space, we store the coefficients that are used to do the elimination at the corresponding position in the column. Notice that we need to update once for the first column, twice for the second column and so on.
+   - 2) Update the elements in the same rows with pivot matrix that were not updated in 1a), using the coefficients stored in 1a). Update here means do the same row operations did in 1a) to the rest part of the row.
+   - 3) Update the lower right part that didn't updated in 1a) 1b) and 2). Update here means do the same row operations did in 1b).
 
+## 3. Intensity for blocked version
+
+   Number of FLOPs:
+
+- 1a): $\frac{N}{M}*f_1(M)$
+
+- 1b): in total, 1b) needs to process $(N-M)*\frac{N}{M}*\frac{1}{2} = \frac{(N-M)N}{2M}$ rows, each with M columns
+
+    In total:
+
+    $\frac{(N-M)N}{2M}*(M+\frac{(1+M)M}{2}*2) = \frac{(M+2)(N-M)N}{2}$ (The   formula for summing an arithmetic series)
+
+- 2): $(N-M)*\frac{N}{M}*\frac{1}{2}*M *2=(N-M)N*2$ 
+
+- 3): $\frac{\frac{N}{M}-1}{6}[(\frac{N}{M}-1)*M][(\frac{N}{M}-1)*M]*2= \frac{(\frac{N}{M}-1)^3M^2}{6} *2 = \frac{(N-M)^3}{3M} $ (The formula for summing the squares of an equivariant series)
+
+    All in total:
+    $$
+    \frac{N}{M}*f(M) + \frac{(N-M)N(M+1)}{2} + (N-M)N*2 + \frac{(N-M)^3}{3M}
+    $$
+    
+
+Data movement:
+
+- 1a): $\frac{N}{M}*f_2(M)$
+
+- 1b): The data movement when focusing on single pivot matrix, when 1b) process Y rows, and when calculating `lik`:
+
+    $Y*\frac{(M+1)M}{2}*3*8 = Y(M+1)M*12$
+
+    In total:
+
+    $(N-M)*\frac{N}{M}*\frac{1}{2}*(M+1)M = \frac{(N-M)N(M+1)}{2}$ (The   formula for summing an arithmetic series)
+
+- 2): same with 1b), $N^2-NM$ 
+
+- 3): $\frac{\frac{N}{M}-1}{6}[(\frac{N}{M}-1)*M][(\frac{N}{M}-1)*M]= \frac{(\frac{N}{M}-1)^3M^2}{6} = \frac{(N-M)^3}{6M}$ (The formula for summing the squares of an equivariant series)
