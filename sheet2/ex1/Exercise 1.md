@@ -33,7 +33,7 @@ $$
 $$
 
 $$
-Intensity = \frac{\frac{2n^3}{3}-\frac{n^2}{2} - \frac{n}{6}}{ \frac{16}{3}n^3 + 4n^2 - \frac{28}{3}n} \approx \frac{1}{8}
+Intensity = \frac{\frac{2n^3}{3}-\frac{n^2}{2} - \frac{n}{6}}{8n^3 - 8n} \approx \frac{1}{12}
 $$
 
 ## 2. LU decomposition with block
@@ -105,9 +105,9 @@ $$
 
 - 2): 2) needs to process $\frac{(N-M)N}{2M}$ columns
 
-    For each column, it needs $f_1(M)$ operations 
+    For each column, it needs $\frac{(0+M-1)M}{2} *2=(M-1)M$ operations 
 
-    In total: $\frac{(N-M)N}{2M} *f_1(M) $ 
+    In total: $\frac{(N-M)N}{2M} *(M-1)M $ 
 
 - 3): The total number of elements that 3) needs to process is $\frac{\frac{N}{M}-1}{6}[(\frac{N}{M}-1)*M][(\frac{N}{M}-1)*M]= \frac{(\frac{N}{M}-1)^3M^2}{6} = \frac{(N-M)^3}{6M}$
 
@@ -118,8 +118,8 @@ $$
 - All in total:
     $$
     \begin{align}
-    & \frac{N}{M}*f_1(M) + \frac{(M+2)(N-M)N}{2} + \frac{(N-M)N}{2M} *f_1(M)  + \frac{(N-M)^3}{3} \\ 
-    &= -\frac{M^3 N}{3} - \frac{M^3}{3} + \frac{M^2 N^2}{3} + \frac{17 M^2 N}{12} - \frac{3 M N^2}{4} - \frac{17 M N}{12} + \frac{N^3}{3} + \frac{11 N^2}{12} - \frac{N}{6}
+    & \frac{N}{M}*f_1(M) + \frac{(M+2)(N-M)N}{2} + \frac{(N-M)N}{2M} *(M-1)M  + \frac{(N-M)^3}{3} \\ 
+    &= -\frac{M^3}{3} + \frac{2 M^2 N}{3} - M N + \frac{N^3}{3} + \frac{N^2}{2} - \frac{N}{6}
     \end{align}
     $$
     
@@ -138,9 +138,11 @@ Data movement:
 
 - 2): 2) needs to process $\frac{(N-M)N}{2M}$ columns
 
-    For each column, it needs $f_2(M)$ data movement 
+    For each column, it needs $\frac{(0+M-1)M}{2}*3*8=(M-1)M*12$ data movement 
 
-    In total: $\frac{(N-M)N}{2M} *f_2(M) $ 
+    For each row, we need to calculate `lik`, which in total is $M *3*8=M*24$
+
+    In total: $\frac{(N-M)N}{2M}* (M-1)M*12 + M *24 = 6(M - 1)N(N - M) + 24M $
 
 - 3): The total number of elements that 3) needs to process is $\frac{(N-M)^3}{6M}$ 
 
@@ -151,11 +153,12 @@ Data movement:
 All in total:
 $$
 \begin{aligned}
-& \frac{N}{M}*f_2(M) + 6(M+3)N(N-M) + \frac{(N-M)N}{2M} *f_2(M) + \frac{16(N-M)^3}{3}\\
-&= -4M^3N - \frac{16M^3}{3} + 4M^2N^2 + 24M^2N - 6M^2 - 16MN^2 + 10MN - 18M + \frac{16N^3}{3} - 4N^2 + 10N
+& \frac{N}{M}*f_2(M) + 6(M+3)N(N-M) + [6(M - 1)N(N - M) + 24M]  + \frac{16(N-M)^3}{3}\\
+&= -4M^3 + 20M^2N - 12M^2 - 12MN^2 + 12MN + 12M + 4N^3 + 4N
 \end{aligned}
 $$
 The intensity is 
 $$
-intensity = \frac{-\frac{M^3 N}{3} - \frac{M^3}{3} + \frac{M^2 N^2}{3} + \frac{17 M^2 N}{12} - \frac{3 M N^2}{4} - \frac{17 M N}{12} + \frac{N^3}{3} + \frac{11 N^2}{12} - \frac{N}{6}}{-4M^3N - \frac{16M^3}{3} + 4M^2N^2 + 24M^2N - 6M^2 - 16MN^2 + 10MN - 18M + \frac{16N^3}{3} - 4N^2 + 10N}
+intensity = \frac{-\frac{M^3}{3} + \frac{2 M^2 N}{3} - M N + \frac{N^3}{3} + \frac{N^2}{2} - \frac{N}{6}}{-4M^3 + 20M^2N - 12M^2 - 12MN^2 + 12MN + 12M + 4N^3 + 4N
+} \approx \frac{1}{12}
 $$
